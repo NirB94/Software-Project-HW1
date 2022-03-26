@@ -1,0 +1,12 @@
+General points:
+- Verify input (K, max_iter are positive ints / input, output are .txt files)
+- Generalize as much as possible (make K, epsilon and max_iter optional)
+- Format to only 4 digits after the dot
+
+C points:
+- Return value is 0 if successful, 1 otherwise
+- Free allocated memory
+- Use double
+
+Python points:
+- Use float
