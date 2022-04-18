@@ -1,5 +1,5 @@
 General points:
-- Verify input (K, max_iter are positive ints / input, output are .txt files)
+- Verify input (max iter is positive integer, K is an integer between 1 and N not inclusive)
 - Generalize as much as possible (make K, epsilon and max_iter optional)
 - Format to only 4 digits after the dot
 
