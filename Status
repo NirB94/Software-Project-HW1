@@ -9,4 +9,4 @@ C points:
 - Use double
 
 Python points:
-- Use float
+- Think about switching centroid rep. from tuple to list
