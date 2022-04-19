@@ -1,5 +1,6 @@
 '''Assignment 1 - Software Project
 In this assignment we were asked to implement k-means algorithm in python and in C.
+Provided here is the python implementation.
 '''
 import sys
 
@@ -30,12 +31,18 @@ def main():
 
 def receive_input():
     assert len(sys.argv) in (4, 5) # Check validity of input
-    K = int(sys.argv[1])
+    try:
+        K = int(sys.argv[1])
+    except:
+        assert 1 == 0
     max_iter = 200
     i = 1
     if len(sys.argv) == 5: # Means max_iter included in input.
         i += 1
-        max_iter = int(sys.argv[2])
+        try:
+            max_iter = int(sys.argv[2])
+        except:
+            assert 2 == 1
     input_file_path = sys.argv[i + 1] # If max_len is not a part of input, this will be second argument.
     output_file_path = sys.argv[i + 2] # Same as above, but 3rd argument.
     return K, max_iter, input_file_path, output_file_path
