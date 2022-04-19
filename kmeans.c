@@ -19,6 +19,7 @@ int first_input_validation(int length_of_input, char *input[])
     return 0;
 }
 
+
 void find_dimensions(char const *filename, int *dims){
     FILE *f = NULL;
     char c;
@@ -47,17 +48,17 @@ void find_dimensions(char const *filename, int *dims){
 }
 
 
-/*double** read_file(char const *filename) 
+double** read_file(char const *filename, int rows, int columns) 
 {
     FILE *f = NULL;
     char c;
-    int columns, rows, i, j;
+    int i, j;
     double** obs;
     f = fopen(filename, "r");
     if (f == NULL) {
         return NULL;
     }
-    /Consider adding a command to get to the next row.
+    /*Consider adding a command to get to the next row.*/
     rewind(f);
     obs = calloc(rows, sizeof(double*));
     for (i = 0; i < rows; i++)
@@ -66,12 +67,12 @@ void find_dimensions(char const *filename, int *dims){
         for (j = 0; j < columns; j++)
         {
             fscanf(f, "%lf%c", &obs[i][j], &c);
-            Consider adding a command to get to the next row.
+            /*Consider adding a command to get to the next row.*/
         }
     }
     fclose(f);
     return obs;
-} */
+}
 
 int second_input_validation(int K, int N, int max_iter)
 {
@@ -85,11 +86,9 @@ int second_input_validation(int K, int N, int max_iter)
 }
 
 
-
-
 int main(int argc, char *argv[])
 {
-    /*double** obs;*/
+    double** obs;
     int K, max_iter, i;
     char* input_file_path;
     int dims[2];
@@ -106,19 +105,17 @@ int main(int argc, char *argv[])
     }
     input_file_path = argv[i+1];
     /*output_file_path = argv[i+2];*/
-    /*obs = read_file(input_file_path);    
-    if (obs == NULL) Condition may be irrelevant, consider deleting.
+ 
+    find_dimensions(input_file_path, dims);
+    obs = read_file(input_file_path, dims[0], dims[1]);
+    if (obs == NULL) /*Condition may be irrelevant, consider deleting.*/
     {
         return 1;
-    }*/
-    find_dimensions(input_file_path, dims);
-    printf("%d, %d, \n", dims[0], dims[1]);
-
+    }
     if (second_input_validation(K, dims[0], max_iter) == 1)
     {
         return 1;
     }
-    printf("%d, %d", dims[0], dims[1]);
-    printf("Reached the end");
+    printf("%f", obs[499][2]);
     return 0;
 }
