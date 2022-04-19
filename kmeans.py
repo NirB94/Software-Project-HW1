@@ -47,7 +47,6 @@ def receive_input():
     output_file_path = sys.argv[i + 2] # Same as above, but 3rd argument.
     return K, max_iter, input_file_path, output_file_path
 
-
 def read_file(file_path):
     f = open(file_path, "r")
     line = f.readline() # Read first line.
@@ -59,10 +58,8 @@ def read_file(file_path):
     f.close()
     return obs
 
-
 def validate_input(K, max_iter, N):
     assert 1<K<N and max_iter > 0
-
 
 def calculate_kmeans(K, max_iter, obs, epsilon):
     clusters = [[obs[i][0], set()] for i in range(K)] # Initialize clusters: observation and members of cluster
@@ -94,13 +91,11 @@ def calculate_kmeans(K, max_iter, obs, epsilon):
         max_iter -= 1
     return clusters
 
-
 def calculate_norm(x, y): # x and y are vectors of same length
     s = 0
     for i in range(len(x)):
         s += (x[i] - y[i]) ** 2
     return s
-
 
 def write_file(file_path, clusters):
     f = open(file_path, "w")
@@ -109,4 +104,5 @@ def write_file(file_path, clusters):
         f.writelines(st)
     f.close()
 
-main()
+if __name__ == "__main__":
+    main()
