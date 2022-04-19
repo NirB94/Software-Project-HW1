@@ -7,6 +7,9 @@ C points:
 - Return value is 0 if successful, 1 otherwise
 - Free allocated memory
 - Use double
+- Comment about find_norm actually calculating the norm squared
 
 Python points:
 - Think about switching centroid rep. from tuple to list
+- Think about spliting finding closet centroid to a helper function
+- Comment about find_norm actually calculating the norm squared
