@@ -61,8 +61,7 @@ def read_file(file_path):
 
 
 def validate_input(K, max_iter, N):
-    assert type(K) == int and type(max_iter) == int \
-         and 1<K<N and max_iter > 0
+    assert 1<K<N and max_iter > 0
 
 
 def calculate_kmeans(K, max_iter, obs, epsilon):
