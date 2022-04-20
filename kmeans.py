@@ -86,7 +86,7 @@ def calculate_kmeans(K, max_iter, obs, epsilon):
             for j in range(len(clusters[i][0])):
                 new_value.append(sum((x[j] for x in clusters[i][1])) / len(clusters[i][1])) # Summation of members of cluster divided by number of members.
             clusters[i][0] = tuple(new_value)
-            if calculate_norm(prev_value, clusters[i][0]) >= epsilon:
+            if calculate_norm(prev_value, clusters[i][0]) >= epsilon ** 2:
                 converged = False
         max_iter -= 1
     return clusters
