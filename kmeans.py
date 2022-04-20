@@ -67,11 +67,11 @@ def calculate_kmeans(K, max_iter, obs, epsilon):
     while (not converged) or max_iter > 0:
         for x in obs: # Check each observation
             minimal_index = 0
-            minimal_sum = calculate_norm(x[0], clusters[0][0])
-            for i in range(1, K): # Find the cluster that brings norm to minimum.
-                curr_sum = calculate_norm(x[0] ,clusters[i][0])
-                if curr_sum < minimal_sum:
-                    minimal_sum = curr_sum
+            minimal_distance = square_euclidean_distance(x[0], clusters[0][0])
+            for i in range(1, K): # Find the cluster that brings distance to minimum.
+                curr_distance = square_euclidean_distance(x[0] ,clusters[i][0])
+                if curr_distance < minimal_distance:
+                    minimal_distance = curr_distance
                     minimal_index = i
             if len(x) != 1: # x has been inserted into a cluster before.
                 clusters[x[1]][1].remove(x[0]) # Remove x from the same cluster.
@@ -86,12 +86,12 @@ def calculate_kmeans(K, max_iter, obs, epsilon):
             for j in range(len(clusters[i][0])):
                 new_value.append(sum((x[j] for x in clusters[i][1])) / len(clusters[i][1])) # Summation of members of cluster divided by number of members.
             clusters[i][0] = tuple(new_value)
-            if calculate_norm(prev_value, clusters[i][0]) >= epsilon ** 2:
+            if square_euclidean_distance(prev_value, clusters[i][0]) >= epsilon ** 2:
                 converged = False
         max_iter -= 1
     return clusters
 
-def calculate_norm(x, y): # x and y are vectors of same length
+def square_euclidean_distance(x, y): # x and y are vectors of same length
     s = 0
     for i in range(len(x)):
         s += (x[i] - y[i]) ** 2
