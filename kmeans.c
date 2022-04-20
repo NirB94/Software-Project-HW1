@@ -79,30 +79,45 @@ int second_input_validation(int K, int N, int max_iter)
     return 0;
 }
 
-double** calculate_kmeans(double** obs, int rows, int columns, int k, int max_iter){
+double** calculate_kmeans(double** obs, int rows, int columns, int k, int max_iter, double epsilon){
     double** old_centroids;
     double** new_centroids;
-    int* cluster_count;
-    int i, j, curr_index;
+    int* cluster_counts;
+    int i, j, curr_index, converged;
     
     old_centroids = calloc(k, sizeof(double*));
     new_centroids = calloc(k, sizeof(double*));
-    cluster_count = calloc(k, sizeof(int));
-    for (i = 0; i < k ; i++){
+    cluster_counts = calloc(k, sizeof(int));
+    for (i = 0; i < k; i++){
         old_centroids[i] = calloc(columns, sizeof(double));
         new_centroids[i] = calloc(columns, sizeof(double));
         for (j = 0; j < columns; j++){
             old_centroids[i][j] = obs[i][j];
         }
     }
-    for (i = 0; i < rows; i++){
-        curr_index = find_closest(old_centroids, obs[i], k, columns);
-        cluster_count[curr_index] += 1;
-        for (j = 0; j < columns; j++){
-            new_centroids[i][j] += obs[i][j];
+    while (converged == 0 || max_iter > 0)
+    {
+        for (i = 0; i < rows; i++){
+            curr_index = find_closest(old_centroids, obs[i], k, columns);
+            cluster_counts[curr_index] += 1;
+            for (j = 0; j < columns; j++){
+                new_centroids[curr_index][j] += obs[i][j];
+            }
         }
+        converged = 1;
+        for (i = 0; i < k; i++){
+            for (j = 0; j < columns; j++){
+                new_centroids[i][j] = new_centroids[i][j] / cluster_counts[i];
+            }
+            if (find_norm(new_centroids[i], old_centroids[i], columns) >= (epsilon * epsilon)){
+                converged = 0;
+            }
+        }
+        max_iter--;
     }
-
+    free(old_centroids);
+    free(cluster_counts);
+    return new_centroids;
 }
 
 int find_closest(double** centroids, double* x, int k, int columns){
@@ -131,7 +146,6 @@ double find_norm(double* x, double* y, int columns){
     }
     return norm;
 }
-
 
 int main(int argc, char *argv[])
 {
