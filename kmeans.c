@@ -79,64 +79,7 @@ int second_input_validation(int K, int N, int max_iter)
     return 0;
 }
 
-double** calculate_kmeans(double** obs, int rows, int columns, int k, int max_iter, double epsilon){
-    double** old_centroids;
-    double** new_centroids;
-    int* cluster_counts;
-    int i, j, curr_index, converged;
-    
-    old_centroids = calloc(k, sizeof(double*));
-    new_centroids = calloc(k, sizeof(double*));
-    cluster_counts = calloc(k, sizeof(int));
-    for (i = 0; i < k; i++){
-        old_centroids[i] = calloc(columns, sizeof(double));
-        new_centroids[i] = calloc(columns, sizeof(double));
-        for (j = 0; j < columns; j++){
-            old_centroids[i][j] = obs[i][j];
-        }
-    }
-    while (converged == 0 || max_iter > 0)
-    {
-        for (i = 0; i < rows; i++){
-            curr_index = find_closest(old_centroids, obs[i], k, columns);
-            cluster_counts[curr_index] += 1;
-            for (j = 0; j < columns; j++){
-                new_centroids[curr_index][j] += obs[i][j];
-            }
-        }
-        converged = 1;
-        for (i = 0; i < k; i++){
-            for (j = 0; j < columns; j++){
-                new_centroids[i][j] = new_centroids[i][j] / cluster_counts[i];
-            }
-            if (find_norm(new_centroids[i], old_centroids[i], columns) >= (epsilon * epsilon)){
-                converged = 0;
-            }
-        }
-        max_iter--;
-    }
-    free(old_centroids);
-    free(cluster_counts);
-    return new_centroids;
-}
-
-int find_closest(double** centroids, double* x, int k, int columns){
-    double minimal_distance, curr_distance;
-    int minimal_index, i;
-    
-    curr_distance = minimal_distance = find_norm(centroids[0], x, columns);
-    minimal_index = 0;
-    for (i = 1; i < k; i++){
-         curr_distance = find_norm(centroids[i], x, columns);
-         if (minimal_distance > curr_distance){
-             minimal_distance = curr_distance;
-             minimal_index = i;
-         }
-    }
-    return minimal_index;
-}
-
-double find_norm(double* x, double* y, int columns){
+double euclid_dist_sq(double* x, double* y, int columns){
     double norm;
     int j;
 
@@ -147,13 +90,79 @@ double find_norm(double* x, double* y, int columns){
     return norm;
 }
 
+int find_closest(double** centroids, double* x, int K, int columns){
+    double minimal_distance, curr_distance;
+    int minimal_index, i;
+    
+    curr_distance = minimal_distance = euclid_dist_sq(centroids[0], x, columns);
+    minimal_index = 0;
+    for (i = 1; i < K; i++){
+         curr_distance = euclid_dist_sq(centroids[i], x, columns);
+         if (minimal_distance > curr_distance){
+             minimal_distance = curr_distance;
+             minimal_index = i;
+         }
+    }
+    return minimal_index;
+}
+
+double** calculate_kmeans(double** obs, int rows, int columns, int K, int max_iter, double epsilon){
+    double** old_centroids;
+    double** new_centroids;
+    int* cluster_counts;
+    int i, j, curr_index, converged;
+    
+    old_centroids = calloc(K, sizeof(double*));
+    new_centroids = calloc(K, sizeof(double*));
+    cluster_counts = calloc(K, sizeof(int));
+    for (i = 0; i < K; i++){
+        old_centroids[i] = calloc(columns, sizeof(double));
+        new_centroids[i] = calloc(columns, sizeof(double));
+        for (j = 0; j < columns; j++){
+            old_centroids[i][j] = obs[i][j];
+        }
+    }
+    converged = 0;
+    while (converged == 0 && max_iter > 0)
+    {
+        for (i = 0; i < rows; i++){
+            curr_index = find_closest(old_centroids, obs[i], K, columns);
+            cluster_counts[curr_index] += 1;
+            for (j = 0; j < columns; j++){
+                new_centroids[curr_index][j] += obs[i][j];
+            }
+        }
+        converged = 1;
+        for (i = 0; i < K; i++){
+            for (j = 0; j < columns; j++){
+                new_centroids[i][j] = new_centroids[i][j] / cluster_counts[i];
+            }
+            if (euclid_dist_sq(new_centroids[i], old_centroids[i], columns) >= (epsilon * epsilon)){
+                converged = 0;
+            }
+        }
+        max_iter--;
+        for (i = 0; i < K; i++){
+            cluster_counts[i] = 0;
+            for (j = 0; j < columns; j++){
+                old_centroids[i][j] = new_centroids[i][j];
+                new_centroids[i][j] = 0;
+            }
+        }
+    }
+    free(new_centroids);
+    free(cluster_counts);
+    return old_centroids;
+}
+
 int main(int argc, char *argv[])
 {
     double** obs;
-    int K, max_iter, i;
     char* input_file_path;
-    int dims[2];
     /*char* output_file_path;*/
+    int dims[2];
+    double** centroids;
+    int K, max_iter, i;
 
     if(first_input_validation(argc, argv) == 1){
         return 1;
@@ -177,5 +186,6 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
+    centroids = calculate_kmeans(obs, dims[0], dims[1], K, max_iter, 0.001);
     return 0;
 }
