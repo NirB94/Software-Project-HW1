@@ -92,7 +92,7 @@ is less than epsilon squared (the distance itself is less than epsilon).
 def calculate_kmeans(K, max_iter, obs, epsilon):
     clusters = [[obs[i][0], set()] for i in range(K)] # Initialize clusters: observation and members of cluster
     converged = False
-    while (not converged) or max_iter > 0:
+    while (not converged) and max_iter > 0:
         for x in obs: # Check each observation
             minimal_index = find_closest(x, clusters)
             if len(x) != 1: # x has been inserted into a cluster before.
