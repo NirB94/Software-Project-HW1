@@ -9,7 +9,7 @@ Provided here is the C implementation.
 #include <ctype.h>
 
 /* 
-The function checks if the given string represents a natural number.
+The function checks if the given string represents a positive integer.
 The function uses the builtin function isdigit from the ctype.h library.
 */
 int is_natural(char st[]){
@@ -22,7 +22,7 @@ int is_natural(char st[]){
     return 0;
 }
 
-/* 
+/*
 The function check if the input is of the right length.
 Then, the function checks whether K and max_iter (if provided) are valid natural numbers.
 */
@@ -43,14 +43,15 @@ int first_input_validation(int length_of_input, char *input[])
 The function retrieves the dimension of the input file.
 The function inputs said dimensions (# of rows and columns) into the dims array.
 */
-void find_dimensions(char const *filename, int *dims){
+int find_dimensions(char const *filename, int *dims){
     FILE *f = NULL;
     char c;
 
     f = fopen(filename, "r");
     if (f == NULL) {
         fclose(f);
-        return;
+        printf("An Error Has Occurred");
+        return 1;
     }
     dims[0] = 0;
     dims[1] = 1;
@@ -69,6 +70,7 @@ void find_dimensions(char const *filename, int *dims){
         }
     }
     fclose(f);
+    return 0;
 }
 
 /*
@@ -84,6 +86,7 @@ double** read_file(char const *filename, int rows, int columns)
 
     f = fopen(filename, "r");
     if (f == NULL) {
+        fclose(f);
         printf("An Error Has Occurred");
         return NULL;
     }
@@ -117,14 +120,14 @@ The function returns the square of the euclidean distance between the two double
 The function assumes the dimension of the arrays is columns.
 */
 double euclid_dist_sq(double* x, double* y, int columns){
-    double norm;
+    double dist;
     int j;
 
-    norm = 0;
+    dist = 0;
     for (j = 0; j < columns; j++){
-        norm += (x[j]-y[j]) * (x[j]-y[j]);
+        dist += (x[j]-y[j]) * (x[j]-y[j]);
     }
-    return norm;
+    return dist;
 }
 
 /*
@@ -190,6 +193,13 @@ double** calculate_kmeans(double** obs, int rows, int columns, int K, int max_it
         }
         converged = 1;
         for (i = 0; i < K; i++){
+            if (cluster_counts[i] == 0){
+                free(old_centroids);
+                free(new_centroids);
+                free(cluster_counts);
+                printf("An Error Has Occurred");
+                return NULL;
+            }
             for (j = 0; j < columns; j++){
                 new_centroids[i][j] = new_centroids[i][j] / cluster_counts[i];
             }
@@ -221,6 +231,7 @@ int write_file(double** centroids, char const *filename, int columns, int K){
     
     f = fopen(filename, "w");
     if (f == NULL){
+        fclose(f);
         printf("An Error Has Occurred");
         return 1;
     }
@@ -255,7 +266,9 @@ int main(int argc, char *argv[])
     }
     input_file_path = argv[i+1];
     output_file_path = argv[i+2];
-    find_dimensions(input_file_path, dims);
+    if (find_dimensions(input_file_path, dims) == 1){
+        return 1;
+    }
     obs = read_file(input_file_path, dims[0], dims[1]);
     if (obs == NULL)
     {
@@ -263,11 +276,16 @@ int main(int argc, char *argv[])
     }
     if (second_input_validation(K, dims[0], max_iter) == 1)
     {
+        free(obs);
         return 1;
     }
     centroids = calculate_kmeans(obs, dims[0], dims[1], K, max_iter, 0.001);
+    if (centroids == NULL){
+        return 1;
+    }
     free(obs);
     if (write_file(centroids, output_file_path, dims[1], K) == 1){
+        free(centroids);
         return 1;
     }
     free(centroids);
