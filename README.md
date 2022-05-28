@@ -4,4 +4,5 @@ The goal of the project is implementing the K-means clustering algorithm.\
 The algorithm is implemented twice - once in C (ANSI) and once in Python (3.8).\
 Students working on the assignment:\
 Yoni Slutzky\
-Nir Borger
+Nir Borger\
+Grade: 94/100: Problem was incorrect use of free() function. Problem was fixed in HW2.
